@@ -1,0 +1,12 @@
+# Minimal, CPU-capable environment for the locked experiment protocol after
+# image/text embeddings have been extracted. Pins were verified under Python
+# 3.13.5 on 2026-08-25; every run still records its installed versions and Git SHA.
+catboost==1.2.10
+joblib==1.5.3
+numpy==2.4.6
+pandas==2.3.3
+Pillow==12.2.0
+PyYAML==6.0.3
+scikit-learn==1.9.0
+scipy==1.17.1
+pytest==8.4.2

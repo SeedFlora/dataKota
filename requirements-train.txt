@@ -1,0 +1,22 @@
+# Training stack (Linux/Windows + CUDA 12.8 GPU).
+# Install with:  pip install -r requirements-train.txt
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.10.0
+torchvision==0.25.0
+timm==1.0.25
+albumentations==2.0.8
+datasets==4.5.0
+huggingface_hub==1.4.1
+pandas==3.0.1
+matplotlib==3.10.8
+seaborn==0.13.2
+PyYAML==6.0.3
+Pillow==12.1.1
+opencv-python-headless==4.13.0.92
+tqdm==4.67.3
+onnx==1.19.1
+onnxruntime==1.23.2
+google-api-python-client==2.184.0
+google-auth-oauthlib==1.2.2
+# include the serve stack so a training box can also run the API
+-r requirements-serve.txt

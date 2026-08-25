@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+.cache/
+artifacts/
+data/
+*.pyc
+*.pyo
+*.pyd
+*.pt
+*.pth
+*.ckpt

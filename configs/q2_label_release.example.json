@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source_split_sha256": "REPLACE_WITH_LOCKED_TEST_CSV_SHA256",
+  "authorized_at_utc": "2026-08-25T00:00:00+00:00",
+  "authorization_mode": "independent_data_custodian",
+  "custodian_role": "REPLACE_WITH_ACCOUNTABLE_DATA_CUSTODIAN_ROLE",
+  "test_labels_not_disclosed_to_model_team": true,
+  "purpose": "Independent routing-label validity audit"
+}

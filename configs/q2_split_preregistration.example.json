@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "source_snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "created_at_utc": "2026-01-01T00:00:00+00:00",
+  "data_custodian": "REPLACE_WITH_ACCOUNTABLE_CUSTODIAN",
+  "test_labels_inspected": false,
+  "rationale": "REPLACE_WITH_DEPLOYMENT-ALIGNED_TEMPORAL_CUTOFF_RATIONALE",
+  "attempt_log": [
+    {
+      "attempt": 1,
+      "decision": "Initial policy frozen before inspecting test-partition labels."
+    }
+  ],
+  "cutoff_policy": {
+    "mode": "temporal_fraction",
+    "train_fraction": 0.7,
+    "val_fraction": 0.15
+  }
+}

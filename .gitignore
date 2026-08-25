@@ -1,0 +1,66 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.env
+!*.env.example
+credentials.json
+token.json
+*secret*.json
+*.pem
+*.p12
+*.pfx
+
+# Private or controlled data
+data/*
+!data/README.md
+!data/schema.example.csv
+private_audit/
+artifacts/
+models/
+checkpoints/
+docs/evaluation/
+*.db
+*.sqlite*
+*.npy
+*.npz
+*.pt
+*.pth
+*.onnx
+*.cbm
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+catboost_info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Flutter and IDE output
+smart_city_reporter_app/.dart_tool/
+smart_city_reporter_app/build/
+smart_city_reporter_app/android/
+smart_city_reporter_app/ios/
+smart_city_reporter_app/linux/
+smart_city_reporter_app/macos/
+smart_city_reporter_app/web/
+smart_city_reporter_app/windows/
+smart_city_reporter_app/env/*.json
+!smart_city_reporter_app/env/*.example.json
+.idea/
+.vscode/
+
+# OS and local output
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+coverage.xml
+htmlcov/

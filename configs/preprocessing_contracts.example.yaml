@@ -1,0 +1,143 @@
+# Illustrative templates only. These are not extraction receipts and deliberately
+# contain REPLACE_* placeholders. Copy the relevant preprocessing object into a
+# schema_version=2 embedding receipt only after measuring the actual pipeline,
+# pinning revisions/versions, hashing every asset, and computing
+# preprocessing_sha256 over canonical sorted compact JSON.
+
+image_huggingface:
+  schema_version: 1
+  modality: image
+  implementation:
+    framework: huggingface_transformers
+    library: transformers
+    library_version: REPLACE_WITH_INSTALLED_VERSION
+    processor_class: transformers.AutoImageProcessor
+    configuration_source: repository_assets
+    processor_repository: REPLACE_WITH_PROCESSOR_REPOSITORY
+    processor_revision: REPLACE_WITH_40_TO_64_HEX_COMMIT
+    assets:
+      - path: preprocessor_config.json
+        sha256: REPLACE_WITH_LOWERCASE_SHA256
+  decode:
+    backend: Pillow
+    backend_version: REPLACE_WITH_INSTALLED_VERSION
+    exif_orientation: apply_exif_transpose
+    color_mode: RGB
+    alpha_channel_policy: drop_after_rgb_conversion
+    animated_image_policy: first_frame
+    missing_image_policy: fail
+    decode_error_policy: fail
+  geometry:
+    resize_mode: exact
+    resize_size: [224, 224]
+    interpolation: bicubic
+    antialias: true
+    preserve_aspect_ratio: false
+    crop_mode: none
+    crop_size: null
+  numeric:
+    input_channel_order: RGB
+    rescale_enabled: true
+    rescale_factor: REPLACE_WITH_EXACT_FACTOR
+    normalize_enabled: true
+    mean: [REPLACE, REPLACE, REPLACE]
+    std: [REPLACE, REPLACE, REPLACE]
+    tensor_layout: NCHW
+    tensor_dtype: float32
+  embedding:
+    pooling: cls_token
+    l2_normalize: false
+    output_dtype: float32
+
+image_timm:
+  schema_version: 1
+  modality: image
+  implementation:
+    framework: timm
+    library: timm
+    library_version: REPLACE_WITH_INSTALLED_VERSION
+    processor_class: timm.data.create_transform
+    configuration_source: explicit_parameters
+    processor_repository: null
+    processor_revision: null
+    # Even a config derived in code must be hashed if deployment consumes it.
+    assets:
+      - path: preprocessor_config.json
+        sha256: REPLACE_WITH_LOWERCASE_SHA256
+  decode:
+    backend: Pillow
+    backend_version: REPLACE_WITH_INSTALLED_VERSION
+    exif_orientation: apply_exif_transpose
+    color_mode: RGB
+    alpha_channel_policy: drop_after_rgb_conversion
+    animated_image_policy: first_frame
+    missing_image_policy: fail
+    decode_error_policy: fail
+  geometry:
+    resize_mode: shortest_edge
+    resize_size: REPLACE_WITH_PIXELS
+    interpolation: bicubic
+    antialias: true
+    preserve_aspect_ratio: true
+    crop_mode: center
+    crop_size: [REPLACE_HEIGHT, REPLACE_WIDTH]
+  numeric:
+    input_channel_order: RGB
+    rescale_enabled: true
+    rescale_factor: REPLACE_WITH_EXACT_FACTOR
+    normalize_enabled: true
+    mean: [REPLACE, REPLACE, REPLACE]
+    std: [REPLACE, REPLACE, REPLACE]
+    tensor_layout: NCHW
+    tensor_dtype: float32
+  embedding:
+    pooling: REPLACE_WITH_EXACT_POOLING
+    l2_normalize: false
+    output_dtype: float32
+
+text_huggingface:
+  schema_version: 1
+  modality: text
+  implementation:
+    framework: huggingface_transformers
+    library: transformers
+    library_version: REPLACE_WITH_INSTALLED_VERSION
+    tokenizer_class: REPLACE_WITH_RESOLVED_TOKENIZER_CLASS
+    tokenizer_repository: REPLACE_WITH_TOKENIZER_REPOSITORY
+    tokenizer_revision: REPLACE_WITH_40_TO_64_HEX_COMMIT
+    # List every file the tokenizer/runtime can read, not only tokenizer.json.
+    assets:
+      - path: tokenizer.json
+        sha256: REPLACE_WITH_LOWERCASE_SHA256
+      - path: tokenizer_config.json
+        sha256: REPLACE_WITH_LOWERCASE_SHA256
+      - path: special_tokens_map.json
+        sha256: REPLACE_WITH_LOWERCASE_SHA256
+  cleaning:
+    input_encoding: utf-8
+    unicode_normalization: none
+    strip: false
+    collapse_whitespace: false
+    lowercase: false
+    newline_policy: preserve
+    html_policy: preserve
+    url_policy: preserve
+    mention_policy: preserve
+    control_character_policy: preserve
+    empty_text_policy: reject
+  tokenization:
+    prefix: "query: "
+    add_special_tokens: true
+    truncation: true
+    truncation_side: right
+    max_length: 256
+    padding: longest
+    padding_side: right
+    pad_to_multiple_of: null
+    return_attention_mask: true
+    return_token_type_ids: auto
+  embedding:
+    pooling: e5_avg
+    pooling_detail: attention_mask_weighted_mean
+    l2_normalize: true
+    output_dtype: float32

@@ -1,0 +1,2 @@
+row_id,embedding_index,label_id,label,laporan,gambar,created_at,leakage_group_id
+0,0,0,Dinas Bina Marga,Contoh sintetis untuk dokumentasi skema,synthetic/example.jpg,2026-01-01T00:00:00Z,synthetic-group-000

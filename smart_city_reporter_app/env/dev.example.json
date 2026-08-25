@@ -1,0 +1,9 @@
+{
+  "SUPABASE_URL": "https://<your-project-ref>.supabase.co",
+  "SUPABASE_ANON_KEY": "sb_publishable_xxx",
+  "ENABLE_TESTING_MODE": "false",
+  "CRM_API_URL": "http://10.0.2.2:8000",
+  "ALLOW_INSECURE_HTTP": "true",
+  "AUTH_REDIRECT_URL": "smartcityapps://login-callback",
+  "_COMMENT": "ALLOW_INSECURE_HTTP is for local development only; release builds must use HTTPS."
+}

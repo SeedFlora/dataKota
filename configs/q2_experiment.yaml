@@ -1,0 +1,258 @@
+schema_version: 1
+experiment_name: crm_multimodal_q2_locked
+
+# Paths are resolved relative to this YAML file. Build splits_q2 with
+# tools/build_q2_splits.py with a frozen --split-preregistration declaration
+# before running selection.
+paths:
+  split_dir: ../artifacts/splits_q2
+  image_embeddings_dir: ../artifacts/embeddings/image
+  text_embeddings_dir: ../artifacts/embeddings/text
+  output_root: ../artifacts/q2_experiments
+
+data:
+  id_column: row_id
+  # This is deliberately separate from row_id. It must identify the row in
+  # each full-dataset .npy embedding cache.
+  embedding_index_column: embedding_index
+  label_column: label_id
+  label_name_column: label
+  text_column: laporan
+  image_column: gambar
+  time_column: created_at
+  group_columns: [leakage_group_id]
+  expected_num_classes: 9
+  require_all_classes: true
+  require_split_manifest: true
+  require_strict_temporal_test: true
+  fail_on_exact_cross_split_duplicates: true
+  l2_per_modality: true
+
+protocol:
+  # Five predetermined seeds; do not add/remove seeds after seeing test scores.
+  seeds: [13, 42, 73, 101, 137]
+  selection_metric: macro_f1
+  # The primary winner must be exportable by the preregistered five-head
+  # runtime. Other candidates remain visible secondary baselines/ablations and
+  # cannot become the deployed primary system merely by topping validation.
+  deployment_eligible_candidates:
+    - cb_dinov2_me5_baseline_point
+    - cb_dinov2_me5_baseline_pgs
+    - cb_dinov3_me5_point
+    - cb_dinov3_me5_pgs
+    - cb_dinov3_bge_m3
+    - cb_eva02_me5
+  hash_embeddings: true
+  # Every <encoder>.npy must have a sibling <encoder>.receipt.json binding the
+  # source/order, exact encoder revision, schema-version-2 modality-specific
+  # preprocessing contract/hash, runtime asset hashes, and extraction commit.
+  # See docs/PREPROCESSING_PROVENANCE.md and the deliberately invalid templates
+  # in configs/preprocessing_contracts.example.yaml.
+  require_embedding_receipts: true
+
+catboost:
+  iterations: 1500
+  learning_rate: 0.05
+  depth: 6
+  l2_leaf_reg: 3.0
+  # Kept identical for point/PGS and long enough to retain 30 virtual ensembles.
+  early_stopping_rounds: 100
+  # Both treatments retain the complete trajectory produced by the same stopping
+  # rule. Trimming only the point head to best_iteration would confound the
+  # point/PGS comparison with a second inference-tree-count intervention.
+  checkpoint_tree_policy: full_early_stopped_trajectory_for_both_point_and_pgs
+  eval_metric: "TotalF1:average=Macro"
+  thread_count: -1
+
+metrics:
+  # No post-hoc calibration is claimed in this protocol. ECE is the top-label
+  # absolute calibration gap over 15 equal-width [0,1] bins. Bins are
+  # [lower, upper), except the final bin which includes 1.0.
+  ece_bins: 15
+  ece_family: top_label
+  ece_binning: equal_width_0_1
+  ece_bin_interval_semantics: left_closed_right_open_final_closed
+
+calibration:
+  # Identity is deliberate and auditable: the study reports calibration
+  # diagnostics but does not relabel uncalibrated probabilities as calibrated.
+  family: identity_no_posthoc_calibration
+  fitting_objective: not_applicable_identity
+  probability_scope: equal_weight_seed_ensemble_probabilities
+  claim: uncalibrated_probabilities
+
+uncertainty:
+  virtual_ensembles: 30
+  coverage_points: [1.0, 0.9, 0.8, 0.7, 0.5, 0.3, 0.1]
+
+selective_review:
+  # Thresholds are empirical validation quantiles of the deployed five-seed
+  # ensemble and are frozen before test.csv is opened. For PGS, confidence and
+  # MI gates use one common marginal quantile that is increased until their
+  # conjunction reaches the target among validation predictions whose predicted
+  # label is routable. Catch-all predictions are always reviewed; their effect is
+  # reported separately in overall coverage. The target is an operating criterion,
+  # not a guarantee of test/prospective coverage or risk.
+  operating_criterion: fixed_target_joint_validation_coverage_on_predicted_routable_labels
+  target_coverage: 0.8
+  target_population: predicted_routable_labels_only
+  threshold_source: validation_seed_ensemble
+  tie_policy: include_all_at_boundary
+
+# All CatBoost candidates share the exact budget above. Candidate-level
+# overrides of iterations/depth/stopping/metric are rejected by the loader.
+candidates:
+  # Neutral DINOv2 + multilingual-E5 comparison baselines. They are not called
+  # a replication/reconstruction because the original split/code are absent.
+  - name: cb_dinov2_me5_baseline_point
+    model: catboost
+    image_encoder: dinov2_large
+    text_encoder: mE5_large
+
+  - name: cb_dinov2_me5_baseline_pgs
+    model: catboost
+    image_encoder: dinov2_large
+    text_encoder: mE5_large
+    posterior_sampling: true
+
+  - name: cb_dinov3_me5_point
+    model: catboost
+    image_encoder: dinov3_large
+    text_encoder: mE5_large
+
+  - name: cb_dinov3_me5_pgs
+    model: catboost
+    image_encoder: dinov3_large
+    text_encoder: mE5_large
+    posterior_sampling: true
+
+  - name: cb_dinov3_bge_m3
+    model: catboost
+    image_encoder: dinov3_large
+    text_encoder: bge_m3
+
+  - name: cb_eva02_me5
+    model: catboost
+    image_encoder: eva02_large
+    text_encoder: mE5_large
+
+  - name: cb_dinov3_image_only
+    model: catboost
+    image_encoder: dinov3_large
+
+  - name: cb_me5_text_only
+    model: catboost
+    text_encoder: mE5_large
+
+  - name: logreg_dinov3_me5
+    model: logistic_regression
+    image_encoder: dinov3_large
+    text_encoder: mE5_large
+    params:
+      C: 1.0
+      max_iter: 2000
+
+  - name: sgdlog_dinov3_me5
+    model: sgd_logistic
+    image_encoder: dinov3_large
+    text_encoder: mE5_large
+    params:
+      alpha: 0.0001
+      max_iter: 2000
+      average: true
+
+  - name: dummy_prior_me5
+    model: dummy_prior
+    text_encoder: mE5_large
+
+  - name: dummy_stratified_me5
+    model: dummy_stratified
+    text_encoder: mE5_large
+
+  - name: tfidf_logistic_raw_text
+    model: tfidf_logistic
+    params:
+      ngram_min: 1
+      ngram_max: 2
+      min_df: 2
+      max_features: 100000
+      C: 1.0
+      max_iter: 2000
+
+  - name: latefusion_dinov3_me5
+    model: late_fusion_catboost
+    image_encoder: dinov3_large
+    text_encoder: mE5_large
+    params:
+      # The weight is selected only on validation and frozen in the checkpoint.
+      image_weight_grid: [0.0, 0.25, 0.5, 0.75, 1.0]
+
+test:
+  # This list is frozen in selection_receipt.json before test.csv is parsed.
+  include_selected: true
+  fixed_candidates:
+    - cb_dinov2_me5_baseline_point
+    - cb_dinov2_me5_baseline_pgs
+    - cb_dinov3_me5_point
+    - cb_dinov3_me5_pgs
+    - cb_dinov3_bge_m3
+    - cb_eva02_me5
+    - cb_dinov3_image_only
+    - cb_me5_text_only
+    - logreg_dinov3_me5
+    - sgdlog_dinov3_me5
+    - dummy_prior_me5
+    - dummy_stratified_me5
+    - tfidf_logistic_raw_text
+    - latefusion_dinov3_me5
+  paired_reference: cb_dinov3_me5_point
+  paired_comparisons:
+    - label: fusion_minus_text
+      reference: cb_me5_text_only
+      challenger: cb_dinov3_me5_point
+    # These point-vs-PGS rows compare complete training+inference packages;
+    # they do not isolate the inference method because the checkpoints differ.
+    - label: pgs_package_minus_point_package
+      reference: cb_dinov3_me5_point
+      challenger: cb_dinov3_me5_pgs
+    - label: dinov3_minus_dinov2_baseline
+      reference: cb_dinov2_me5_baseline_point
+      challenger: cb_dinov3_me5_point
+    - label: dinov2_pgs_package_minus_dinov2_point_package
+      reference: cb_dinov2_me5_baseline_point
+      challenger: cb_dinov2_me5_baseline_pgs
+    - label: fusion_minus_stratified_random
+      reference: dummy_stratified_me5
+      challenger: cb_dinov3_me5_point
+    - label: catboost_minus_logreg
+      reference: logreg_dinov3_me5
+      challenger: cb_dinov3_me5_point
+    - label: me5_embedding_minus_tfidf
+      reference: tfidf_logistic_raw_text
+      challenger: cb_me5_text_only
+    - label: late_fusion_minus_early_fusion
+      reference: cb_dinov3_me5_point
+      challenger: latefusion_dinov3_me5
+  # Mandatory inference-only ablations. For each listed posterior-trained
+  # checkpoint and seed, evaluate native predict_proba and VirtEnsembles on the
+  # exact same serialized checkpoint with the exact same retained tree count.
+  matched_checkpoint_inference_ablations:
+    - candidate: cb_dinov3_me5_pgs
+      label: dinov3_pgs_inference_minus_native_point_same_checkpoint
+    - candidate: cb_dinov2_me5_baseline_pgs
+      label: dinov2_pgs_inference_minus_native_point_same_checkpoint
+  # Frozen before the test set is opened. Each replicate resamples complete
+  # leakage groups within UTC-month x cluster-majority-label strata; it never
+  # resamples individual rows.
+  bootstrap_iterations: 10000
+  bootstrap_seed: 271828
+  bootstrap_stratification: utc_month_x_cluster_majority_label_v1
+  # Secondary only: quantify sensitivity to a hypothetical population of
+  # training seeds. This is never reported as the deployed five-head CI.
+  training_seed_sensitivity_iterations: 10000
+  training_seed_sensitivity_seed: 271828
+  confidence_level: 0.95
+  # Cluster-level sign-flips are applied to the single equal-weight mean-
+  # probability prediction vector formed from all preregistered seeds.
+  cluster_permutation_iterations: 20000
+  cluster_permutation_seed: 314159

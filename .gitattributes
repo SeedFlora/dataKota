@@ -1,0 +1,29 @@
+* text=auto
+
+*.py text eol=lf
+*.sh text eol=lf
+*.dart text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.cff text eol=lf
+*.csv text eol=lf
+*.ipynb text eol=lf
+Dockerfile text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.dockerignore text eol=lf
+.env.example text eol=lf
+requirements*.txt text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.ttf binary
+
+# Historical golden renders remain excluded until they are regenerated and
+# privacy-reviewed.
+smart_city_reporter_app/test/screenshots/shots/*.png export-ignore
