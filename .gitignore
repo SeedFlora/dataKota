@@ -31,6 +31,17 @@ docs/evaluation/
 *.pth
 *.onnx
 *.cbm
+*.safetensors
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.keras
+*.tflite
+*.parquet
+*.feather
+*.arrow
 
 # Python
 .venv/

@@ -4,8 +4,8 @@ No real Jakarta CRM records are distributed in this repository. This directory
 contains one synthetic schema row and three non-sensitive aggregate tables:
 
 - `schema.example.csv` illustrates fields expected by the locked experiment;
-- `author_reported_class_metrics.csv` transcribes the published four-decimal
-  class report used by the integer-reconstruction audit;
+- `author_reported_class_metrics.csv` transcribes the author-reported historical
+  four-decimal class report used by the integer-reconstruction audit;
 - `reconstructed_class_counts.csv` is the deterministic output of that audit;
 - `author_reported_encoder_matrix.csv` preserves the exploratory 4x4 macro-F1
   matrix discussed in the paper.
