@@ -1,8 +1,8 @@
 # dataKota
 
 Research software and non-sensitive reproducibility materials for the paper
-**“An Evidence Audit of Multimodal Citizen-Complaint Triage on Jakarta CRM
-Data.”** The project combines image and Indonesian complaint-text features,
+**"An Evidence Audit of Multimodal Citizen-Complaint Triage on Jakarta CRM
+Data."** The project combines image and Indonesian complaint-text features,
 an evidence-bound evaluation protocol, a FastAPI inference contract, and the
 core Flutter/Supabase client implementation.
 
@@ -19,8 +19,9 @@ dataset before such claims can be made.
 
 ```text
 configs/                    Locked experiment and preprocessing examples
-data/                       Public schema documentation only
+data/                       Public schema and aggregate paper-audit tables
 docs/                       Data/model cards and evidence protocols
+figures/                    Reproducible aggregate paper figure
 notebooks/                  Output-cleared historical workflow notebooks
 src/crm/                    Multimodal and evaluation-contract implementation
 tools/                      Split, experiment, privacy, parity, and export tools
@@ -31,6 +32,20 @@ serve_model.py              FastAPI inference service
 
 Generated embeddings, model weights, checkpoints, prediction files, database
 dumps, real environment files, and credentials are deliberately excluded.
+
+The paper's exact arithmetic audit is independently reproducible from public
+aggregate values:
+
+```bash
+python tools/reconstruct_rounded_metrics.py \
+  --csv-out data/reconstructed_class_counts.csv
+pip install -r requirements-analysis.txt
+python tools/build_paper_figures.py
+```
+
+The reconstruction exhaustively enumerates integer class margins compatible
+with the printed four-decimal precision, recall, F1, and supports. It does not
+recover off-diagonal confusion cells or any sample identity.
 
 ## Quick start
 
@@ -54,9 +69,8 @@ python tools/q2_readiness.py --help
 ```
 
 The curated snapshot was validated on Python 3.13.5 on 26 August 2026:
-`140 passed, 1 skipped`. The skipped test depends on optional runtime tooling;
-the test outcome is not evidence that the historical study is reproducible or
-that a deployment release exists.
+`143 passed`. The test outcome is not evidence that the historical study is
+reproducible or that a deployment release exists.
 
 For the inference service, install `requirements-serve.txt`, copy
 `.env.example` to `.env`, and replace every placeholder locally. The real

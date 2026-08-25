@@ -1,0 +1,5 @@
+image_encoder,multilingual_e5_large,bge_m3,indobert,cendol_mt5
+DINOv3-L,0.7747,0.7628,0.7449,0.7340
+DINOv2-L,0.7736,0.7651,0.7471,0.7305
+EVA-02-L,0.7747,0.7634,0.7429,0.7323
+Hiera-L,0.7652,0.7558,0.7285,0.7149

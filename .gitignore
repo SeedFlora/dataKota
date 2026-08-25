@@ -15,6 +15,9 @@ token.json
 data/*
 !data/README.md
 !data/schema.example.csv
+!data/author_reported_class_metrics.csv
+!data/author_reported_encoder_matrix.csv
+!data/reconstructed_class_counts.csv
 private_audit/
 artifacts/
 models/
@@ -64,3 +67,8 @@ Thumbs.db
 *.bak
 coverage.xml
 htmlcov/
+
+# Reproducible aggregate paper figures (never raw complaint media)
+figures/*
+!figures/README.md
+!figures/reconstructed_class_errors.pdf

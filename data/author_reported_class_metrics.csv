@@ -1,0 +1,10 @@
+label,precision,recall,f1,support
+Roads and public works,0.8644,0.8797,0.8720,2029
+Public order police,0.8432,0.8699,0.8564,1261
+Transportation,0.8443,0.8699,0.8569,1752
+Urban village administration,0.8103,0.6939,0.7476,1797
+Parks and forestry,0.8924,0.9122,0.9022,900
+Water resources,0.5577,0.7417,0.6367,391
+"Building, spatial planning, and land",0.8398,0.8778,0.8584,221
+Regional-owned enterprises,0.6711,0.7937,0.7273,252
+Other agency (catch-all),0.5486,0.4857,0.5152,663
